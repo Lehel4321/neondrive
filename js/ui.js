@@ -581,7 +581,7 @@ window.ND = window.ND || {};
 
   // ---------- boot ----------
 
-  window.addEventListener('DOMContentLoaded', function () {
+  function boot() {
     tryRestore();
 
     els.songName = $('#songname');
@@ -606,5 +606,11 @@ window.ND = window.ND || {};
     });
 
     requestAnimationFrame(raf);
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })(window.ND);

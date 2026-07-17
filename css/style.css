@@ -1,5 +1,13 @@
 /* NEON DRIVE — synthwave styling */
 
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url('../fonts/orbitron.woff2') format('woff2');
+}
+
 :root {
   --bg: #0a0118;
   --panel: rgba(16, 4, 38, 0.82);
