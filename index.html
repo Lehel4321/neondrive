@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEON DRIVE — Synthwave Studio</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🌆</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="nd-bg">
+    <div class="nd-sun"></div>
+    <div class="nd-gridfloor"></div>
+  </div>
+
+  <header>
+    <div class="nd-titlebar">
+      <h1>NEON<span>DRIVE</span></h1>
+      <div class="nd-subtitle">SYNTHWAVE STUDIO</div>
+      <div id="songname" class="nd-songname">—</div>
+      <canvas id="scope" width="360" height="56"></canvas>
+    </div>
+    <div id="transport"></div>
+    <div id="status" class="nd-status"></div>
+  </header>
+
+  <main>
+    <section id="chords" class="nd-panel">
+      <div class="nd-panel-head">
+        <h2>CHORDS</h2>
+        <div class="nd-controls"></div>
+      </div>
+    </section>
+
+    <section id="drums" class="nd-panel">
+      <div class="nd-panel-head">
+        <h2>DRUMS</h2>
+        <div class="nd-controls"></div>
+      </div>
+    </section>
+
+    <section id="bass" class="nd-panel">
+      <div class="nd-panel-head">
+        <h2>BASS</h2>
+        <div class="nd-controls"></div>
+      </div>
+    </section>
+
+    <section id="arp" class="nd-panel">
+      <div class="nd-panel-head">
+        <h2>ARP</h2>
+        <div class="nd-controls"></div>
+      </div>
+    </section>
+
+    <section id="pads" class="nd-panel">
+      <div class="nd-panel-head">
+        <h2>PADS</h2>
+        <div class="nd-controls"></div>
+      </div>
+    </section>
+
+    <section id="lead" class="nd-panel">
+      <div class="nd-panel-head">
+        <h2>LEAD MELODY</h2>
+        <div class="nd-controls"></div>
+      </div>
+    </section>
+
+    <section id="master" class="nd-panel">
+      <div class="nd-panel-head">
+        <h2>MASTER FX</h2>
+        <div class="nd-controls"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Press <b>SPACE</b> to play/stop · Click or drag on the grids to paint notes ·
+      Every note is locked to the scale, so nothing can sound wrong ·
+      Hold a melody note across columns to sustain it ·
+      <b>🎲 GENERATE</b> writes a whole new song for you</p>
+  </footer>
+
+  <script src="js/presets.js"></script>
+  <script src="js/synth.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
