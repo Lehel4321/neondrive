@@ -258,6 +258,14 @@ window.ND = window.ND || {};
 
   document.addEventListener('pointerup', function () { painting = null; });
 
+  var DRUM_NAMES = { kick: 'Kick', snare: 'Snare', clap: 'Clap', hat: 'Hi-hat', openhat: 'Open hat' };
+
+  // Single place that keeps a cell's look (class) and its screen-reader state (aria-pressed) in sync.
+  function setDrumCell(c, on) {
+    c.classList.toggle('on', on);
+    c.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+
   function buildDrums() {
     var sec = $('#drums');
     var ctl = sec.querySelector('.nd-controls');
@@ -290,18 +298,29 @@ window.ND = window.ND || {};
       for (var s = 0; s < 16; s++) {
         (function (row, s) {
           var c = el('button', 'nd-cell nd-' + row + (s % 4 === 0 ? ' beat' : ''), grid);
+          c.type = 'button';
+          c.setAttribute('aria-label', (DRUM_NAMES[row] || row) + ', step ' + (s + 1));
           c.addEventListener('pointerdown', function (e) {
             e.preventDefault();
             var val = ND.state.drums[row][s] ? 0 : 1;
             painting = { kind: 'drum-' + row, value: val };
             ND.state.drums[row][s] = val;
-            c.classList.toggle('on', !!val);
+            setDrumCell(c, !!val);
+            save();
+          });
+          // Keyboard (Space/Enter) and assistive-tech activation arrive as a click with detail 0;
+          // real mouse/touch clicks are already handled by pointerdown above.
+          c.addEventListener('click', function (e) {
+            if (e.detail !== 0) return;
+            var val = ND.state.drums[row][s] ? 0 : 1;
+            ND.state.drums[row][s] = val;
+            setDrumCell(c, !!val);
             save();
           });
           c.addEventListener('pointerenter', function () {
             if (painting && painting.kind === 'drum-' + row) {
               ND.state.drums[row][s] = painting.value;
-              c.classList.toggle('on', !!painting.value);
+              setDrumCell(c, !!painting.value);
               save();
             }
           });
@@ -314,7 +333,7 @@ window.ND = window.ND || {};
   function refreshDrumGrid() {
     ND.DRUM_ROWS.forEach(function (row) {
       drumCells[row].forEach(function (c, s) {
-        c.classList.toggle('on', !!ND.state.drums[row][s]);
+        setDrumCell(c, !!ND.state.drums[row][s]);
       });
     });
   }
@@ -599,7 +618,8 @@ window.ND = window.ND || {};
     refreshAll();
 
     document.addEventListener('keydown', function (e) {
-      if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' &&
+          !(e.target.classList && e.target.classList.contains('nd-cell'))) {
         e.preventDefault();
         togglePlay();
       }
