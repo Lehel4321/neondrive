@@ -482,5 +482,12 @@ footer b { color: var(--text); }
   h1 { font-size: 28px; }
   #scope { display: none; }
   .nd-panel h2 { min-width: 0; }
-  .nd-drumgrid { grid-template-columns: 40px repeat(16, 1fr); }
+  /* let the 16 steps shrink to fit instead of pushing the page sideways */
+  .nd-drumgrid { grid-template-columns: 40px repeat(16, minmax(0, 1fr)); gap: 3px; }
+  .nd-drumgrid .nd-cell { min-width: 0; }
+}
+
+@media (max-width: 420px) {
+  main { padding: 8px 10px 30px; }
+  .nd-panel { padding: 12px 10px; }
 }
