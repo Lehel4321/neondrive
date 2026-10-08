@@ -185,7 +185,7 @@ window.ND = window.ND || {};
 
   // ---------- live transport ----------
 
-  var LOOKAHEAD = 0.18, TICK_MS = 30;
+  var LOOKAHEAD = 0.18, TICK_MS = 30, MAX_LAG = 0.1;
 
   ND.engine = {
     ctx: null,
@@ -223,6 +223,13 @@ window.ND = window.ND || {};
 
     tick: function () {
       var stepDur = 60 / ND.state.bpm / 4;
+      // If the timer was starved (hidden tab, busy main thread) we may be far
+      // behind the audio clock. Skip the missed steps, keeping the beat grid,
+      // instead of firing them all at once as a noise burst.
+      while (this.nextTime < this.ctx.currentTime - MAX_LAG) {
+        this.step = (this.step + 1) % TOTAL;
+        this.nextTime += stepDur;
+      }
       while (this.nextTime < this.ctx.currentTime + LOOKAHEAD) {
         ND.scheduleStep(this.graph, this.step, this.nextTime, stepDur);
         this.displayQueue.push({ step: this.step, time: this.nextTime });
