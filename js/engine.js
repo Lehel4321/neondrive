@@ -194,6 +194,7 @@ window.ND = window.ND || {};
     step: 0,
     nextTime: 0,
     timer: null,
+    pendingStop: null, // {timer, sources} while stop() is fading out the last notes
     displayQueue: [], // {step, time} pairs so the UI playhead is sample-accurate
 
     ensure: function () {
@@ -212,10 +213,23 @@ window.ND = window.ND || {};
       this.playing = true;
       ND.applyLevels(this.graph);
       ND.applyDelayTime(this.graph);
-      this.graph.cut.gain.cancelScheduledValues(this.ctx.currentTime);
-      this.graph.cut.gain.setValueAtTime(1, this.ctx.currentTime);
+      var now = this.ctx.currentTime, start = now + 0.08;
+      var cut = this.graph.cut.gain;
+      cut.cancelScheduledValues(now);
+      if (this.pendingStop) {
+        // restarted before the last stop() finished (e.g. GENERATE while playing):
+        // fade the old tails out and end them where the new playback begins, instead
+        // of letting the stale stop timer kill the notes we are about to schedule
+        clearTimeout(this.pendingStop.timer);
+        this.pendingStop.sources.forEach(function (s) {
+          try { s.stop(start); } catch (e) { /* already stopped */ }
+        });
+        this.pendingStop = null;
+        cut.setTargetAtTime(0, now, 0.015);
+      }
+      cut.setValueAtTime(1, start);
       this.step = 0;
-      this.nextTime = this.ctx.currentTime + 0.08;
+      this.nextTime = start;
       this.displayQueue = [];
       this.timer = setInterval(function () { self.tick(); }, TICK_MS);
       this.tick();
@@ -237,13 +251,18 @@ window.ND = window.ND || {};
       clearInterval(this.timer);
       var now = this.ctx.currentTime;
       this.graph.cut.gain.setTargetAtTime(0, now, 0.015);
-      var g = this.graph;
-      setTimeout(function () {
-        g.sources.forEach(function (s) {
-          try { s.stop(); } catch (e) { /* already stopped */ }
-        });
-        g.sources.clear();
-      }, 120);
+      // only silence the sources that exist now, so a quick restart keeps its new notes
+      var self = this, old = Array.from(this.graph.sources);
+      this.graph.sources.clear();
+      this.pendingStop = {
+        sources: old,
+        timer: setTimeout(function () {
+          self.pendingStop = null;
+          old.forEach(function (s) {
+            try { s.stop(); } catch (e) { /* already stopped */ }
+          });
+        }, 120),
+      };
       this.displayQueue = [];
     },
 
